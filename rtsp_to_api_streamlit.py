@@ -20,7 +20,7 @@ if img_file is not None:
         # Send to FastAPI backend
         try:
             response = requests.post(
-                "http://YOUR_BACKEND_URL/recognize-frame",  # ← Replace with public or localhost + ngrok
+                "http://zahangir.pythonanywhere.com/recognize-frame",  # ← Replace with public or localhost + ngrok
                 files={"file": ("frame.jpg", img_bytes, "image/jpeg")}
             )
             if response.ok:
