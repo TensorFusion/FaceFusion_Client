@@ -1,52 +1,32 @@
 import streamlit as st
-import cv2
-import time
 import requests
 import numpy as np
+import cv2
 
-st.title("RTSP to Face Recognition API")
+st.title("🧠 Webcam Face Recognition Demo")
 
-rtsp_url = st.text_input("Enter RTSP URL:", value="rtsp://your_camera_ip/stream1")
-send_interval = st.slider("Send every N-th frame", 1, 30, 10)
-show_preview = st.checkbox("Show Video Preview", value=True)
-start_button = st.button("Start Streaming")
+st.markdown("Use your webcam to capture an image and send it to the Face Recognition API.")
 
-def send_frame_to_api(frame):
-    _, img_encoded = cv2.imencode('.jpg', frame)
-    response = requests.post(
-        "http://localhost:8000/recognize-frame",
-        files={"file": ("frame.jpg", img_encoded.tobytes(), "image/jpeg")}
-    )
-    return response.json()
+# Capture a frame from webcam
+img_file = st.camera_input("Take a photo")
 
-if start_button:
-    st.write("Connecting to RTSP stream...")
-    cap = cv2.VideoCapture(rtsp_url)
-    
-    if not cap.isOpened():
-        st.error("Failed to open RTSP stream.")
-    else:
-        frame_counter = 0
-        frame_placeholder = st.empty()
-        result_box = st.empty()
+if img_file is not None:
+    st.image(img_file, caption="📸 Captured Frame", use_column_width=True)
 
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                st.warning("Stream ended or failed to read frame.")
-                break
+    with st.spinner("Processing image..."):
+        # Read the image as bytes
+        img_bytes = img_file.getvalue()
 
-            frame_counter += 1
-
-            if frame_counter % send_interval == 0:
-                with st.spinner("Sending frame to API..."):
-                    result = send_frame_to_api(frame)
-                    result_box.json(result)
-
-            if show_preview:
-                # Resize for display
-                preview = cv2.resize(frame, (640, 360))
-                frame_placeholder.image(preview, channels="BGR")
-
-            # Add small sleep to prevent locking the browser
-            time.sleep(0.03)
+        # Send to FastAPI backend
+        try:
+            response = requests.post(
+                "http://YOUR_BACKEND_URL/recognize-frame",  # ← Replace with public or localhost + ngrok
+                files={"file": ("frame.jpg", img_bytes, "image/jpeg")}
+            )
+            if response.ok:
+                st.success("✅ Face Recognition Result:")
+                st.json(response.json())
+            else:
+                st.error(f"❌ API Error: {response.text}")
+        except Exception as e:
+            st.error(f"❌ Failed to connect to backend: {e}")
