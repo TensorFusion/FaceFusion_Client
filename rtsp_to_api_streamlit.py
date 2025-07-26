@@ -11,7 +11,7 @@ st.markdown("Use your webcam to capture an image and send it to the Face Recogni
 img_file = st.camera_input("Take a photo")
 
 if img_file is not None:
-    st.image(img_file, caption="📸 Captured Frame", use_column_width=True)
+    st.image(img_file, caption="📸 Captured Frame", use_container_width=True)
 
     with st.spinner("Processing image..."):
         # Read the image as bytes
