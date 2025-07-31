@@ -3,7 +3,7 @@ import requests
 import numpy as np
 import cv2
 
-st.title("🧠 Webcam Face Recognition Demo")
+st.title("Webcam Face Recognition Demo")
 
 st.markdown("Use your webcam to capture an image and send it to the Face Recognition API.")
 
@@ -20,13 +20,13 @@ if img_file is not None:
         # Send to FastAPI backend
         try:
             response = requests.post(
-                "http://zahangir.pythonanywhere.com/recognize-frame",  # ← Replace with public or localhost + ngrok
+                "http://zahangir.pythonanywhere.com/face-reg",
                 files={"file": ("frame.jpg", img_bytes, "image/jpeg")}
             )
             if response.ok:
                 st.success("✅ Face Recognition Result:")
                 st.json(response.json())
             else:
-                st.error(f"❌ API Error: {response.text}")
+                st.error(f"API Error: {response.text}")
         except Exception as e:
-            st.error(f"❌ Failed to connect to backend: {e}")
+            st.error(f"Failed to connect to backend: {e}")
